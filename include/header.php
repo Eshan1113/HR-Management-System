@@ -1,7 +1,12 @@
 <?php
-session_start();
+
 // Fetch the admin's last login time from the session or database
 $last_login = $_SESSION['last_login'] ?? 'Never logged in';
+
+// Format the last login time and date if it exists
+if ($last_login !== 'Never logged in') {
+    $last_login = date('h:i A, d M Y', strtotime($last_login)); // Format: 02:30 PM, 15 Oct 2023
+}
 ?>
 
 <!DOCTYPE html>
@@ -25,9 +30,10 @@ $last_login = $_SESSION['last_login'] ?? 'Never logged in';
                 <!-- Navigation Links -->
                 <div class="flex items-center space-x-4">
                     <a href="dashboard.php" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                    <a href="view_employees.php" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium">Employees</a>
-                    <a href="reports.php" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium">Reports</a>
-                    <a href="settings.php" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium">Settings</a>
+                    <a href="view_employees.php" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium">Add Employees</a>
+                    <a href="view_employee.php" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium">Viwe Employees Details
+                    </a>
+                  
                 </div>
 
                 <!-- Admin Info and Last Login -->
@@ -39,7 +45,7 @@ $last_login = $_SESSION['last_login'] ?? 'Never logged in';
                     <div class="relative">
                         <!-- Profile Dropdown -->
                         <button id="profileDropdown" class="flex items-center text-white focus:outline-none">
-                            <img src="../img/1.jpg" alt="Admin" class="w-8 h-8 rounded-full">
+                            <img src="img/1.jpg" alt="Admin" class="w-8 h-8 rounded-full">
                             <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
@@ -47,7 +53,6 @@ $last_login = $_SESSION['last_login'] ?? 'Never logged in';
 
                         <!-- Dropdown Menu -->
                         <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
-                           
                             <a href="logout.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
                         </div>
                     </div>
