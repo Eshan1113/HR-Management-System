@@ -14,7 +14,7 @@ if ($last_login !== 'Never logged in') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>HR Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
@@ -24,7 +24,7 @@ if ($last_login !== 'Never logged in') {
             <div class="flex justify-between h-16">
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="dashboard.php" class="text-white text-2xl font-bold">Admin Panel</a>
+                    <a href="dashboard.php" class="text-white text-2xl font-bold">HR Panel</a>
                 </div>
 
                 <!-- Navigation Links -->
