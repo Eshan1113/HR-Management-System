@@ -1,13 +1,14 @@
 <?php
 session_start();
-include 'Connection/db.php';
+include 'Connection/db.php'; // This defines $pdo
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = :username");
+    // Use $pdo instead of $conn
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username");
     $stmt->execute(['username' => $username]);
     $user = $stmt->fetch();
 
