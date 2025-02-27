@@ -1,70 +1,38 @@
 <?php
-// search_employee.php
-
-// Start the session
-session_start();
-
 // Include the database connection
-include_once 'Connection/db.php';
+include('Connection/db.php');
 
-// Function to safely escape HTML
-function safe_html($string) {
-    return htmlspecialchars($string ?? '', ENT_QUOTES, 'UTF-8');
-}
-
-// Check if the search term is set
-if (isset($_POST['search'])) {
-    $searchTerm = trim($_POST['search']);
+// Check if a search term is passed
+if (isset($_GET['search'])) {
+    $searchTerm = '%' . $_GET['search'] . '%'; // Adding wildcards for LIKE query
 
     try {
-        // Prepare the search query
-        $query = "SELECT * FROM human_resource_list_dt 
-                  WHERE name LIKE :search 
-                  OR dt_employee_number LIKE :search 
-                  OR dt_system_hr_number LIKE :search 
-                  OR calling_name LIKE :search 
-                  OR category LIKE :search 
-                  OR manpower_agent LIKE :search 
-                  OR employee_id LIKE :search 
-                  OR Job title LIKE :search 
-                  OR dt_job_role LIKE :search 
-                  OR skillness LIKE :search 
-                  OR address LIKE :search 
-                  OR contact_tel LIKE :search 
-                  OR office_location LIKE :search 
-                  ORDER BY sr_no DESC";
-        $stmt = $pdo->prepare($query);
-        $stmt->execute([':search' => "%$searchTerm%"]);
+        // Prepare SQL statement to search for employees by name or calling name
+        $stmt = $pdo->prepare("SELECT * FROM human_resource_list_dt WHERE name LIKE :searchTerm OR calling_name LIKE :searchTerm");
+        $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
+        $stmt->execute();
 
-        // Fetch the results
-        $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Generate the HTML for the table rows
-        $html = '';
-        if (count($employees) > 0) {
-            foreach ($employees as $row) {
-                $html .= '<tr>';
-                $html .= '<td>' . safe_html($row['dt_employee_number']) . '</td>';
-                $html .= '<td>' . safe_html($row['name']) . '</td>';
-                $html .= '<td>' . safe_html($row['Job title']) . '</td>';
-                $html .= '<td>' . safe_html($row['contact_tel']) . '</td>';
-                $html .= '<td>' . safe_html($row['office_location']) . '</td>';
-                $html .= '<td>';
-                $html .= '<button class="btn btn-sm btn-info view-btn" data-id="' . safe_html($row['sr_no']) . '"><i class="fas fa-eye"></i></button>';
-                $html .= '<button class="btn btn-sm btn-warning edit-btn" data-id="' . safe_html($row['sr_no']) . '"><i class="fas fa-edit"></i></button>';
-                $html .= '<button class="btn btn-sm btn-danger delete-btn" data-id="' . safe_html($row['sr_no']) . '"><i class="fas fa-trash"></i></button>';
-                $html .= '</td>';
-                $html .= '</tr>';
+        // Fetch all results
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($results) {
+            // Loop through the results and output table rows
+            foreach ($results as $row) {
+                echo '<tr>';
+                echo '<td>' . htmlspecialchars($row['sr_no']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['dt_employee_number']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['name']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['Job title']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['contact_tel']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['office _location']) . '</td>';
+                echo '</tr>';
             }
         } else {
-            $html .= '<tr><td colspan="6" class="text-center">No employees found.</td></tr>';
+            // If no results found, display message
+            echo '<tr><td colspan="6" class="text-center">No results found.</td></tr>';
         }
-
-        echo $html;
     } catch (PDOException $e) {
-        echo '<tr><td colspan="6" class="text-center text-danger">An error occurred while searching.</td></tr>';
+        // In case of any error, display it
+        echo 'Error: ' . $e->getMessage();
     }
-} else {
-    echo '<tr><td colspan="6" class="text-center text-danger">Invalid request.</td></tr>';
 }
 ?>
