@@ -16,6 +16,12 @@ if ($last_login !== 'Never logged in') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Remove underline from the logo link */
+        a {
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -25,15 +31,6 @@ if ($last_login !== 'Never logged in') {
                 <!-- Logo -->
                 <div class="flex items-center">
                     <a href="dashboard.php" class="text-white text-2xl font-bold">HR Panel</a>
-                </div>
-
-                <!-- Navigation Links -->
-                <div class="flex items-center space-x-4">
-                    <a href="dashboard.php" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                    <a href="view_employees.php" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium">Add Employees</a>
-                    <a href="view_employee.php" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium">Viwe Employees Details
-                    </a>
-                  
                 </div>
 
                 <!-- Admin Info and Last Login -->
