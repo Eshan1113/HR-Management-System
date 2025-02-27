@@ -1,38 +1,73 @@
 <?php
+// search_employee.php
+
 // Include the database connection
-include('Connection/db.php');
 
-// Check if a search term is passed
-if (isset($_GET['search'])) {
-    $searchTerm = '%' . $_GET['search'] . '%'; // Adding wildcards for LIKE query
+// Connection/db.php
 
-    try {
-        // Prepare SQL statement to search for employees by name or calling name
-        $stmt = $pdo->prepare("SELECT * FROM human_resource_list_dt WHERE name LIKE :searchTerm OR calling_name LIKE :searchTerm");
-        $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
-        $stmt->execute();
+$host = 'localhost'; // Database host
+$dbname = 'dt_database'; // Database name
+$username = 'root'; // Database username
+$password = ''; // Database password
 
-        // Fetch all results
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if ($results) {
-            // Loop through the results and output table rows
-            foreach ($results as $row) {
-                echo '<tr>';
-                echo '<td>' . htmlspecialchars($row['sr_no']) . '</td>';
-                echo '<td>' . htmlspecialchars($row['dt_employee_number']) . '</td>';
-                echo '<td>' . htmlspecialchars($row['name']) . '</td>';
-                echo '<td>' . htmlspecialchars($row['Job title']) . '</td>';
-                echo '<td>' . htmlspecialchars($row['contact_tel']) . '</td>';
-                echo '<td>' . htmlspecialchars($row['office _location']) . '</td>';
-                echo '</tr>';
-            }
-        } else {
-            // If no results found, display message
-            echo '<tr><td colspan="6" class="text-center">No results found.</td></tr>';
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Enable exceptions for errors
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+// Get the search term from the AJAX request
+$searchTerm = isset($_POST['search']) ? trim($_POST['search']) : '';
+
+try {
+    // Prepare the SQL query to search for employees
+    $query = "SELECT * FROM human_resource_list_dt 
+              WHERE name LIKE :search 
+              OR dt_employee_number LIKE :search 
+              OR `Job title` LIKE :search 
+              OR contact_tel LIKE :search 
+              OR `office _location` LIKE :search 
+              ORDER BY sr_no DESC";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([':search' => "%$searchTerm%"]);
+
+    // Fetch the results
+    $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Generate the HTML for the table rows
+    $html = '';
+    if (count($employees) > 0) {
+        foreach ($employees as $row) {
+            $html .= '<tr>
+                        <td>' . htmlspecialchars($row['dt_employee_number']) . '</td>
+                        <td>' . htmlspecialchars($row['name']) . '</td>
+                        <td>' . htmlspecialchars($row['Job title']) . '</td>
+                        <td>' . htmlspecialchars($row['contact_tel']) . '</td>
+                        <td>' . htmlspecialchars($row['office _location']) . '</td>
+                        <td>
+                            <button class="btn btn-sm btn-info view-btn" data-id="' . htmlspecialchars($row['sr_no']) . '">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning edit-btn" data-id="' . htmlspecialchars($row['sr_no']) . '">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger delete-btn" data-id="' . htmlspecialchars($row['sr_no']) . '">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                      </tr>';
         }
-    } catch (PDOException $e) {
-        // In case of any error, display it
-        echo 'Error: ' . $e->getMessage();
+    } else {
+        $html = '<tr><td colspan="6" class="text-center">No employees found.</td></tr>';
     }
+
+    echo $html;
+} catch (PDOException $e) {
+    // Log the error (optional)
+    error_log("Database Error: " . $e->getMessage());
+
+    // Return an error message
+    echo '<tr><td colspan="6" class="text-center text-danger">An error occurred while searching. Please check the logs for details.</td></tr>';
 }
 ?>
